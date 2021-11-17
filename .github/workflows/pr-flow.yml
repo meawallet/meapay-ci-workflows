@@ -13,6 +13,10 @@ on:
       test_results_files:
         required: true
         type: string
+    secrets:
+      maven_repo_access_token:
+        description: 'Maven repo access token'
+        required: true
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -33,7 +37,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Preparing build
         env:
-          MAVEN_REPO_PAT: ${{ secrets.MAVEN_REPO_PAT }}
+          MAVEN_REPO_PAT: ${{ secrets.maven_repo_access_token }}
         run: |
           # Configuring credentials for Gradle connection to Azure Artifacts
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template

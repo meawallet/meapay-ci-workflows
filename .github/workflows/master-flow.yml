@@ -14,6 +14,16 @@ on:
       image_publish_command:
         required: true
         type: string
+    secrets:
+      maven_repo_access_token:
+        description: 'Maven repo access token'
+        required: true
+      cr_user:
+        description: 'Container registry user'
+        required: true
+      cr_password:
+        description: 'Container registry password'
+        required: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,7 +43,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Preparing build
         env:
-          MAVEN_REPO_PAT: ${{ secrets.MAVEN_REPO_PAT }}
+          MAVEN_REPO_PAT: ${{ secrets.maven_repo_access_token }}
         run: |
           # Configuring credentials for Gradle connection to Azure Artifacts
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
@@ -46,8 +56,8 @@ jobs:
       - name: Building and Pushing Docker image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}
-          ACR_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USER }}
-          ACR_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+          ACR_USERNAME: ${{ secrets.cr_user }}
+          ACR_PASSWORD: ${{ secrets.cr_password }}
         uses: gradle/gradle-build-action@v2
         if: success()
         with:

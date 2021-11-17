@@ -39,18 +39,10 @@ jobs:
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
           mv local.properties-template local.properties
           cat local.properties
-      - name: Restore Maven cache
-        uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: restore
       - name: Build project
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ inputs.build_command }}
-      - name: Save Maven cache
-        uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: save
       - name: Run integration tests
         uses: gradle/gradle-build-action@v2
         if: ${{ inputs.itest_command != 0 }}

@@ -39,10 +39,6 @@ jobs:
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
           mv local.properties-template local.properties
           cat local.properties
-      - name: Restore Maven cache
-        uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: restore
       - name: Build Mobile module
         uses: gradle/gradle-build-action@v2
         with:

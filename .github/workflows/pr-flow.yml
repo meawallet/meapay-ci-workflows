@@ -1,4 +1,3 @@
-
 name: Pull request flow.
 
 # Controls when the workflow will run
@@ -9,7 +8,7 @@ on:
         required: true
         type: string
       itest_command:
-        required: true
+        required: false
         type: string
       test_results_files:
         required: true
@@ -54,6 +53,7 @@ jobs:
           step: save
       - name: Run integration tests
         uses: gradle/gradle-build-action@v2
+        if: ${{ inputs.itest_command != 0 }}
         with:
           arguments: ${{ inputs.itest_command }}
       - name: Publish Unit Test Results

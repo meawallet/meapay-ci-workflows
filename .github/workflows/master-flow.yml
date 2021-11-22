@@ -39,7 +39,6 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 11
-
       # Runs a set of commands using the runners shell
       - name: Preparing build
         env:
@@ -48,7 +47,7 @@ jobs:
           # Configuring credentials for Gradle connection to Azure Artifacts
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
           mv local.properties-template local.properties
-          cat local.properties
+          echo ::set-output name=image_version::$(./gradlew -q printVersion)
       - name: Build Mobile module
         uses: gradle/gradle-build-action@v2
         with:
@@ -58,6 +57,7 @@ jobs:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}
           ACR_USERNAME: ${{ secrets.cr_user }}
           ACR_PASSWORD: ${{ secrets.cr_password }}
+          IMAGE_VERSION: ${{ steps.vars.outputs.image_version }}
         uses: gradle/gradle-build-action@v2
         if: success()
         with:

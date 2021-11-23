@@ -41,6 +41,7 @@ jobs:
           java-version: 11
       # Runs a set of commands using the runners shell
       - name: Preparing build
+        if: hashFiles('local.properties-template') != ''
         env:
           MAVEN_REPO_PAT: ${{ secrets.maven_repo_access_token }}
         run: |

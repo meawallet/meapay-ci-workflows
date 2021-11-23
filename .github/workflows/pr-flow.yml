@@ -43,7 +43,7 @@ jobs:
           # Configuring credentials for Gradle connection to Azure Artifacts
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
           mv local.properties-template local.properties
-          chmod +x ./gradlew
+          ls -l
       - name: Build project
         uses: gradle/gradle-build-action@v2
         with:

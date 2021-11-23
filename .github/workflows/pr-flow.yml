@@ -36,15 +36,13 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Preparing build
-        #if: hashFiles('local.properties-template') != ''
+        if: hashFiles('local.properties-template') != ''
         env:
           MAVEN_REPO_PAT: ${{ secrets.maven_repo_access_token }}
         run: |
           # Configuring credentials for Gradle connection to Azure Artifacts
-          #sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
-          #mv local.properties-template local.properties
-          ls -l
-          chmod +x ./gradlew
+          sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
+          mv local.properties-template local.properties
       - name: Build project
         uses: gradle/gradle-build-action@v2
         with:

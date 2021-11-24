@@ -58,7 +58,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         if: success() && ${{ inputs.artifacts_publish_command != 0 }}
         with:
-          arguments: ${{ inputs.artifacts_publish_command }}
+          arguments: ${{ inputs.artifacts_publish_command }} -PmavenUser=banklaunch -PmavenPassword=${{ secrets.maven_repo_access_token }}
       - name: Publish Docker Image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}

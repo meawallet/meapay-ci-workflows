@@ -5,13 +5,13 @@ on:
       build_command:
         required: true
         type: string
-      publish_artifacts_command:
+      artifacts_publish_command:
         required: false
         type: string
       image_name:
         required: false
         type: string
-      publish_image_command:
+      image_publish_command:
         required: false
         type: string
     secrets:
@@ -56,9 +56,9 @@ jobs:
           arguments: ${{ inputs.build_command }}
       - name: Publish Artifacts
         uses: gradle/gradle-build-action@v2
-        if: success() && ${{ inputs.publish_artifacts_command != 0 }}
+        if: success() && ${{ inputs.artifacts_publish_command != 0 }}
         with:
-          arguments: ${{ inputs.publish_artifacts_command }}
+          arguments: ${{ inputs.artifacts_publish_command }}
       - name: Publish Docker Image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}
@@ -66,6 +66,6 @@ jobs:
           ACR_PASSWORD: ${{ secrets.cr_password }}
           IMAGE_VERSION: ${{ steps.vars.outputs.image_version }}
         uses: gradle/gradle-build-action@v2
-        if: success() && ${{ inputs.publish_image_command != 0 }}
+        if: success() && ${{ inputs.image_publish_command != 0 }}
         with:
-          arguments: ${{ inputs.publish_image_command }}
+          arguments: ${{ inputs.image_publish_command }}

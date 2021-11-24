@@ -1,6 +1,3 @@
-
-name: Build and publish image
-
 # Controls when the workflow will run
 on:
   workflow_call:
@@ -8,11 +5,14 @@ on:
       build_command:
         required: true
         type: string
-      image_name:
-        required: true
+      publish_artifacts_command:
+        required: false
         type: string
-      image_publish_command:
-        required: true
+      image_name:
+        required: false
+        type: string
+      publish_image_command:
+        required: false
         type: string
     secrets:
       maven_repo_access_token:
@@ -20,10 +20,10 @@ on:
         required: true
       cr_user:
         description: 'Container registry user'
-        required: true
+        required: false
       cr_password:
         description: 'Container registry password'
-        required: true
+        required: false
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -41,25 +41,31 @@ jobs:
           java-version: 11
       # Runs a set of commands using the runners shell
       - name: Preparing build
+        # not all repos have local properties file
         if: hashFiles('local.properties-template') != ''
         env:
           MAVEN_REPO_PAT: ${{ secrets.maven_repo_access_token }}
         run: |
           # Configuring credentials for Gradle connection to Azure Artifacts
-          sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
-          mv local.properties-template local.properties
+          # sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
+          # mv local.properties-template local.properties
           echo ::set-output name=image_version::$(./gradlew -q printVersion)
-      - name: Build Mobile module
+      - name: Building project
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ inputs.build_command }}
-      - name: Building and Pushing Docker image
+      - name: Publish Artifacts
+        uses: gradle/gradle-build-action@v2
+        if: success() && ${{ inputs.publish_artifacts_command != 0 }}
+        with:
+          arguments: ${{ inputs.publish_artifacts_command }}
+      - name: Publish Docker Image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}
           ACR_USERNAME: ${{ secrets.cr_user }}
           ACR_PASSWORD: ${{ secrets.cr_password }}
           IMAGE_VERSION: ${{ steps.vars.outputs.image_version }}
         uses: gradle/gradle-build-action@v2
-        if: success()
+        if: success() && ${{ inputs.publish_image_command != 0 }}
         with:
-          arguments: ${{ inputs.image_publish_command }}
+          arguments: ${{ inputs.publish_image_command }}

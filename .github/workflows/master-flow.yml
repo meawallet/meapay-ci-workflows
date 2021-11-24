@@ -68,4 +68,4 @@ jobs:
         uses: gradle/gradle-build-action@v2
         if: success() && ${{ inputs.image_publish_command != 0 }}
         with:
-          arguments: ${{ inputs.image_publish_command }}
+          arguments: ${{ inputs.image_publish_command }} -PacrPassword=${{ secrets.cr_password }}

@@ -11,6 +11,9 @@ on:
       test_results_files:
         required: true
         type: string
+      spotbugs_results_files:
+        required: false
+        type: string
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
@@ -45,6 +48,11 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ inputs.build_command }}
+      - name: Publish spotbugs results
+        uses: jwgmeligmeyling/spotbugs-github-action@master
+        if: ${{ inputs.spotbugs_results_files != 0 }}
+        with:
+          path: ${{ inputs.spotbugs_results_files }}
       - name: Run integration tests
         env:
           SPRING_PROFILES_ACTIVE: 'itest,ci'

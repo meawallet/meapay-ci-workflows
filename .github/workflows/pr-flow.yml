@@ -50,7 +50,7 @@ jobs:
           arguments: ${{ inputs.build_command }}
       - name: Publish spotbugs results
         uses: jwgmeligmeyling/spotbugs-github-action@master
-        if: ${{ inputs.spotbugs_results_files != 0 }}
+        if: ${{ failure() && inputs.spotbugs_results_files != 0 }}
         with:
           path: ${{ inputs.spotbugs_results_files }}
       - name: Run integration tests

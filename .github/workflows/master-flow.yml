@@ -70,6 +70,8 @@ jobs:
           mv local.properties-template local.properties
           echo ::set-output name=image_version::$(./gradlew -q printVersion)
       - name: Building project
+        run: |
+          echo Test ${{ steps.vars.outputs.codeartifact_auth_token }}
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ inputs.build_command }}

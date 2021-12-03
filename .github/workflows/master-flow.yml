@@ -17,7 +17,7 @@ on:
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
-        required: true
+        required: false
       cr_user:
         description: 'Container registry user'
         required: false

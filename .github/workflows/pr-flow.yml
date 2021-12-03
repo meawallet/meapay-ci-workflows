@@ -17,7 +17,16 @@ on:
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
-        required: true
+        required: false
+      aws_account_id:
+        description: 'AWS_ACCESS_KEY_ID '
+        required: false
+      aws_access_key_id:
+        description: 'AWS_ACCESS_KEY_ID '
+        required: false
+      aws_secret_access_key_id:
+        description: 'AWS_SECRET_ACCESS_KEY '
+        required: false
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -35,11 +44,23 @@ jobs:
         with:
           java-version: 11
 
+      - name: Configure AWS Credentials
+        if: ${{ inputs.aws_access_key_id != 0 && inputs.aws_secret_access_key_id != 0  }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.aws_access_key_id }}
+          aws-secret-access-key: ${{ secrets.aws_secret_access_key_id }}
+          aws-region: eu-central-1
+      - name: Set AWS CodeArtifact Token
+        if: ${{ inputs.aws_access_key_id != 0 && inputs.aws_secret_access_key_id != 0  }}
+        run: echo ::set-output name=codeartifact_auth_token::$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)
+
+
       # Runs a set of commands using the runners shell
       - name: Preparing build
         if: hashFiles('local.properties-template') != ''
         env:
-          MAVEN_REPO_PAT: ${{ secrets.maven_repo_access_token }}
+          MAVEN_REPO_PAT: ${{ steps.vars.outputs.codeartifact_auth_token }}
         run: |
           # Configuring credentials for Gradle connection to Azure Artifacts
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template

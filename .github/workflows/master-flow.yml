@@ -55,14 +55,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.aws_secret_access_key_id }}
           aws-region: eu-central-1
       - name: Set AWS CodeArtifact Token
+        id: aws-token
         run: |
           echo "::set-output name=codeartifact_auth_token::$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)"
           echo ::set-output name=image_version::$(./gradlew -q printVersion)
 
       # Runs a set of commands using the runners shell
       - run: |
-          echo codeartifact_auth_token ${{ steps.vars.outputs.codeartifact_auth_token }}
-          echo image_version ${{ steps.vars.outputs.image_version }}
+          echo codeartifact_auth_token ${{ steps.aws-token.outputs.codeartifact_auth_token }}
+          echo image_version ${{ steps.aws-token.outputs.image_version }}
       - name: Preparing build
         # not all repos have local properties file
         if: hashFiles('local.properties-template') != ''

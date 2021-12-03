@@ -56,6 +56,7 @@ jobs:
           aws-region: eu-central-1
       - name: Set AWS CodeArtifact Token
         run: |
+          aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text
           echo ::set-output name=codeartifact_auth_token::$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)
 
       # Runs a set of commands using the runners shell
@@ -79,7 +80,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         if: success() && ${{ inputs.artifacts_publish_command != 0 }}
         with:
-          arguments: ${{ inputs.artifacts_publish_command }} "-PmavenUser=aws -PmavenPassword=$CODEARTIFACT_AUTH_TOKEN"
+          arguments: ${{ inputs.artifacts_publish_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
       - name: Publish Docker Image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}

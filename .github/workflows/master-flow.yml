@@ -48,6 +48,7 @@ jobs:
       - name: Initialize variables
         id: vars
         run: |
+          ./gradlew printVersion
           codeartifact_token=$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)
           echo "::add-mask::$codeartifact_token"
           echo "::set-output name=codeartifact_auth_token::$codeartifact_token"

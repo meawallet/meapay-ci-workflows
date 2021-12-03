@@ -54,16 +54,11 @@ jobs:
           aws-access-key-id: ${{ secrets.aws_access_key_id }}
           aws-secret-access-key: ${{ secrets.aws_secret_access_key_id }}
           aws-region: eu-central-1
-      - name: Set AWS CodeArtifact Token
-        id: aws-token
+      - name: Initialize variables
+        id: vars
         run: |
           echo "::set-output name=codeartifact_auth_token::$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)"
-          echo ::set-output name=image_version::$(./gradlew -q printVersion)
-
-      # Runs a set of commands using the runners shell
-      - run: |
-          echo codeartifact_auth_token ${{ steps.aws-token.outputs.codeartifact_auth_token }}
-          echo image_version ${{ steps.aws-token.outputs.image_version }}
+          echo "::set-output name=image_version::$(./gradlew -q printVersion)"
       - name: Preparing build
         # not all repos have local properties file
         if: hashFiles('local.properties-template') != ''
@@ -73,14 +68,12 @@ jobs:
           # Configuring credentials for Gradle connection to Azure Artifacts
           sed -i "s/PERSONAL_ACCESS_TOKEN/$MAVEN_REPO_PAT/g" local.properties-template
           mv local.properties-template local.properties
-          echo ::set-output name=image_version::$(./gradlew -q printVersion)
+
       - name: Building project
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ inputs.build_command }}
       - name: Publish Artifacts
-        env:
-          CODEARTIFACT_AUTH_TOKEN: ${{ steps.vars.outputs.codeartifact_auth_token }}
         uses: gradle/gradle-build-action@v2
         if: success() && ${{ inputs.artifacts_publish_command != 0 }}
         with:

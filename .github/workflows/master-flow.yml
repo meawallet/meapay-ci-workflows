@@ -56,8 +56,7 @@ jobs:
           aws-region: eu-central-1
       - name: Set AWS CodeArtifact Token
         run: |
-          aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text
-          echo ::set-output name=codeartifact_auth_token::$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)
+          echo "::set-output name=codeartifact_auth_token::$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)"
 
       # Runs a set of commands using the runners shell
       - name: Preparing build

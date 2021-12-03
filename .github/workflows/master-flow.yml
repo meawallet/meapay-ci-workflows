@@ -26,13 +26,13 @@ on:
         required: false
       aws_account_id:
         description: 'AWS_ACCOUNT_ID '
-        required: required
+        required: true
       aws_access_key_id:
         description: 'AWS_ACCESS_KEY_ID '
-        required: required
+        required: true
       aws_secret_access_key_id:
         description: 'AWS_SECRET_ACCESS_KEY '
-        required: required
+        required: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

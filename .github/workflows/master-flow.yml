@@ -58,7 +58,7 @@ jobs:
         id: vars
         run: |
           token=$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)
-          echo "::add-mask::token"
+          echo "::add-mask::$token"
           echo "::set-output name=codeartifact_auth_token::$token"
           echo "::set-output name=image_version::$(./gradlew -q printVersion)"
       - name: Preparing build

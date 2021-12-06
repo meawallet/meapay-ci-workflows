@@ -54,9 +54,7 @@ jobs:
           echo "::set-output name=codeartifact_auth_token::$codeartifact_token"
           echo "::set-output name=image_version::$(./gradlew -q printVersion)"
 
-          # commented out for now, fails with User: arn:aws:iam::***:user/github is not authorized to perform: ecr:GetAuthorizationToken on resource: * because no identity-based policy allows the ecr:GetAuthorizationToken action
           ecr_token=$(aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken')
-          echo "$ecr_token"
           echo "::add-mask::$ecr_token"
           echo "::set-output name=ecr_auth_token::$ecr_token"
       - name: Preparing build

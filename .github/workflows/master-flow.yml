@@ -62,7 +62,7 @@ jobs:
           echo "::set-output name=image_version::$(./gradlew -q printVersion)"
 
           ecr_token=$(aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken')
-          # echo "::add-mask::$ecr_token"
+          echo "::add-mask::$ecr_token"
           echo "::set-output name=ecr_auth_token::$ecr_token"
       - name: Preparing build
         # not all repos have local properties file

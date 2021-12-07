@@ -82,8 +82,6 @@ jobs:
       - name: Publish Docker Image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}
-          ACR_USERNAME: "aws"
-          ACR_PASSWORD: ${{ steps.vars.outputs.ecr_auth_token }}
           IMAGE_VERSION: ${{ steps.vars.outputs.image_version }}
         uses: gradle/gradle-build-action@v2
         if: success() && ${{ inputs.image_publish_command != 0 }}

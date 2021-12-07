@@ -69,7 +69,7 @@ jobs:
       - name: Build project
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ${{ inputs.build_command }}
+          arguments: ${{ inputs.build_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
       - name: Publish spotbugs results
         uses: jwgmeligmeyling/spotbugs-github-action@master
         if: ${{ failure() && inputs.spotbugs_results_files != 0 }}
@@ -81,7 +81,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         if: ${{ inputs.itest_command != 0 }}
         with:
-          arguments: ${{ inputs.itest_command }}
+          arguments: ${{ inputs.itest_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: always()

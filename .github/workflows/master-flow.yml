@@ -40,16 +40,23 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0      
+          fetch-depth: 0
+
       - uses: actions/setup-java@v1
         with:
           java-version: 11
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.aws_access_key_id }}
           aws-secret-access-key: ${{ secrets.aws_secret_access_key_id }}
           aws-region: eu-central-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Initialize variables
         id: vars
         run: |
@@ -64,6 +71,7 @@ jobs:
           ecr_token=$(aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken')
           echo "::add-mask::$ecr_token"
           echo "::set-output name=ecr_auth_token::$ecr_token"
+
       - name: Preparing build
         # not all repos have local properties file
         if: hashFiles('local.properties-template') != ''
@@ -78,11 +86,13 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ inputs.build_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
+
       - name: Publish Artifacts
         uses: gradle/gradle-build-action@v2
         if: success() && ${{ inputs.artifacts_publish_command != 0 }}
         with:
           arguments: ${{ inputs.artifacts_publish_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
+
       - name: Publish Docker Image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}

@@ -88,4 +88,4 @@ jobs:
         uses: gradle/gradle-build-action@v2
         if: success() && ${{ inputs.image_publish_command != 0 }}
         with:
-          arguments: ${{ inputs.image_publish_command }} -PacrPassword=${{ steps.vars.outputs.ecr_auth_token }}
+          arguments: ${{ inputs.image_publish_command }} -PacrUsername=aws -PacrPassword=${{ steps.vars.outputs.ecr_auth_token }}

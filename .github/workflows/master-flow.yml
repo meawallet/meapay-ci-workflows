@@ -58,11 +58,14 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Initialize variables
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         id: vars
         run: |
           ./gradlew printVersion
           git describe --tags --always --first-parent
           git tag
+          echo $ECR_REGISTRY
           codeartifact_token=$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)
           echo "::add-mask::$codeartifact_token"
           echo "::set-output name=codeartifact_auth_token::$codeartifact_token"

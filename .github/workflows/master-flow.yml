@@ -91,7 +91,7 @@ jobs:
         with:
           arguments: ${{ inputs.artifacts_publish_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
 
-      - name: Publish Docker Image
+      - name: Create Docker Image
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}
           IMAGE_VERSION: ${{ steps.vars.outputs.image_version }}
@@ -99,3 +99,8 @@ jobs:
         if: success() && ${{ inputs.image_publish_command != 0 }}
         with:
           arguments: ${{ inputs.image_publish_command }} -PacrUsername=aws -PacrPassword=${{ steps.vars.outputs.ecr_auth_token }}
+
+      - name: Push image to remote registry
+        run: |
+          docker push ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
+

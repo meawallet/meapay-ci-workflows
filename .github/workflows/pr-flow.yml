@@ -78,12 +78,10 @@ jobs:
         with:
           path: ${{ inputs.spotbugs_results_files }}
       - name: Run integration tests
-        env:
-          SPRING_PROFILES_ACTIVE: 'ci,itest'
         uses: gradle/gradle-build-action@v2
         if: ${{ inputs.itest_command != 0 }}
         with:
-          arguments: ${{ inputs.itest_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
+          arguments: ${{ inputs.itest_command }} -Dspring.profiles.active=ci,itest -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: always()

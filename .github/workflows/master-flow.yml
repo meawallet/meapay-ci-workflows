@@ -87,12 +87,12 @@ jobs:
 
       - name: Publish Artifacts
         uses: gradle/gradle-build-action@v2
-        if: success() && ${{ inputs.artifacts_publish_command != 0 }}
+        if: ${{ success() && inputs.artifacts_publish_command != 0 }}
         with:
           arguments: ${{ inputs.artifacts_publish_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
 
       - name: Create Docker Image
-        if: success() && ${{ inputs.docker_build_command != 0 }}
+        if: ${{ success() && inputs.docker_build_command != 0 }}
         env:
           DOCKER_IMAGE_NAME: ${{ inputs.image_name }}
           IMAGE_VERSION: ${{ steps.vars.outputs.image_version }}
@@ -101,7 +101,7 @@ jobs:
           arguments: ${{ inputs.docker_build_command }}
 
       - name: Push image to remote registry
-        if: success() && ${{ inputs.docker_build_command != 0 }}
+        if: ${{ success() && inputs.docker_build_command != 0 }}
         run: |
           docker push ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
 

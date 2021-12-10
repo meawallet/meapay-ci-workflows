@@ -55,6 +55,7 @@ jobs:
           aws-region: eu-central-1
 
       - name: Login to Amazon ECR
+        if: ${{ inputs.docker_build_command != 0 }}
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
@@ -65,10 +66,6 @@ jobs:
           echo "::add-mask::$codeartifact_token"
           echo "::set-output name=codeartifact_auth_token::$codeartifact_token"
           echo "::set-output name=image_version::$(./gradlew -q printVersion)"
-
-          ecr_token=$(aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken')
-          echo "::add-mask::$ecr_token"
-          echo "::set-output name=ecr_auth_token::$ecr_token"
 
       - name: Preparing build
         # not all repos have local properties file

@@ -79,7 +79,7 @@ jobs:
           path: ${{ inputs.spotbugs_results_files }}
       - name: Run integration tests
         env:
-          SPRING_PROFILES_ACTIVE: 'itest,ci'
+          SPRING_PROFILES_ACTIVE: 'ci,itest'
         uses: gradle/gradle-build-action@v2
         if: ${{ inputs.itest_command != 0 }}
         with:

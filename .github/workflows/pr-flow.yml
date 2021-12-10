@@ -19,7 +19,7 @@ on:
         description: 'Maven repo access token'
         required: false
       aws_account_id:
-        description: 'AWS_ACCESS_KEY_ID '
+        description: 'AWS_ACCOUNT_ID '
         required: false
       aws_access_key_id:
         description: 'AWS_ACCESS_KEY_ID '

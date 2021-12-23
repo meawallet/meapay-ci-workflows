@@ -64,6 +64,7 @@ jobs:
           token=$(aws codeartifact get-authorization-token --domain meapay-app --domain-owner ${{ secrets.aws_account_id }} --query authorizationToken --output text)
           echo "::add-mask::$token"
           echo "::set-output name=codeartifact_auth_token::$token"
+          echo "::set-output name=run_url::https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       # Runs a set of commands using the runners shell
       - name: Preparing build
@@ -102,4 +103,4 @@ jobs:
         uses: slackapi/slack-github-action@v1.16.0
         with:
           channel-id: ${{ inputs.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
-          slack-message: "Build failed https://github.com/${{ env.GITHUB_REPOSITORY }}/actions/runs/$GITHUB_RUN_NUMBER"
+          slack-message: Build failed ${{ steps.vars.outputs.run_url }}

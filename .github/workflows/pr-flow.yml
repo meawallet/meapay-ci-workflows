@@ -14,6 +14,9 @@ on:
       spotbugs_results_files:
         required: false
         type: string
+      slack_channel_id:
+        required: false
+        type: string
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
@@ -26,6 +29,9 @@ on:
         required: false
       aws_secret_access_key_id:
         description: 'AWS_SECRET_ACCESS_KEY '
+        required: false
+      slack_bot_token:
+        description: 'SLACK_BOT_TOKEN '
         required: false
 
 
@@ -87,3 +93,12 @@ jobs:
         if: always()
         with:
           files: ${{ inputs.test_results_files }}
+      - name: Post to a Slack channel
+        id: slack
+        if: ${{ failure() && inputs.slack_channel_id != 0 }}
+        uses: slackapi/slack-github-action@v1.16.0
+        with:
+          channel-id: ${{ inputs.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
+          slack-message: "Build failed https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_NUMBER"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.slack_bot_token }}

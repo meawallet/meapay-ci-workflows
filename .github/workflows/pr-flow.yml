@@ -100,6 +100,6 @@ jobs:
         uses: slackapi/slack-github-action@v1.16.0
         with:
           channel-id: ${{ inputs.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
-          slack-message: "Build failed https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_NUMBER"
+          slack-message: "Build failed https://github.com/${{ env.GITHUB_REPOSITORY }}/actions/runs/$GITHUB_RUN_NUMBER"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.slack_bot_token }}

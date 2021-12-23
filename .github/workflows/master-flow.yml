@@ -95,7 +95,7 @@ jobs:
           IMAGE_VERSION: ${{ steps.vars.outputs.image_version }}
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ${{ inputs.docker_build_command }} -Dquarkus.container-image.name=${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
+          arguments: ${{ inputs.docker_build_command }} -Dquarkus.container-image.image=${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
 
       - name: Push image to remote registry
         if: ${{ success() && inputs.docker_build_command != 0 }}

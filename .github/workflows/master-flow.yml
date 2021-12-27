@@ -14,6 +14,9 @@ on:
       docker_build_command:
         required: false
         type: string
+      slack_channel_id:
+        required: false
+        type: string
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
@@ -27,6 +30,9 @@ on:
       aws_secret_access_key_id:
         description: 'AWS_SECRET_ACCESS_KEY '
         required: true
+      slack_bot_token:
+        description: 'SLACK_BOT_TOKEN '
+        required: false
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -66,6 +72,7 @@ jobs:
           echo "::add-mask::$codeartifact_token"
           echo "::set-output name=codeartifact_auth_token::$codeartifact_token"
           echo "::set-output name=image_version::$(./gradlew -q printVersion)"
+          echo "::set-output name=run_url::https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Preparing build
         # not all repos have local properties file
@@ -101,4 +108,14 @@ jobs:
         if: ${{ success() && inputs.docker_build_command != 0 }}
         run: |
           docker push ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
+
+      - name: Post to a Slack channel
+        id: slack
+        if: ${{ failure() && inputs.slack_channel_id != 0 }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.slack_bot_token }}
+        uses: slackapi/slack-github-action@v1.16.0
+        with:
+          channel-id: ${{ inputs.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
+          slack-message: Build failed ${{ steps.vars.outputs.run_url }}
 

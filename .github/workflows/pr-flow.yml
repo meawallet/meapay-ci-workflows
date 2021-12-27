@@ -96,7 +96,7 @@ jobs:
           files: ${{ inputs.test_results_files }}
       - name: Post to a Slack channel
         id: slack
-        if: ${{ failure() && secrets.slack_channel_id != 0 }}
+        if: failure()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.slack_bot_token }}
         uses: slackapi/slack-github-action@v1.16.0

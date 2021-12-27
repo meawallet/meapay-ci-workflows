@@ -32,7 +32,6 @@ on:
         required: false
       slack_channel_id:
         required: false
-        type: string
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel

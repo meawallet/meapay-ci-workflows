@@ -14,24 +14,24 @@ on:
       docker_build_command:
         required: false
         type: string
-      slack_channel_id:
-        required: false
-        type: string
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
         required: false
       aws_account_id:
-        description: 'AWS_ACCOUNT_ID '
+        description: 'AWS_ACCOUNT_ID'
         required: true
       aws_access_key_id:
-        description: 'AWS_ACCESS_KEY_ID '
+        description: 'AWS_ACCESS_KEY_ID'
         required: true
       aws_secret_access_key_id:
-        description: 'AWS_SECRET_ACCESS_KEY '
+        description: 'AWS_SECRET_ACCESS_KEY'
         required: true
       slack_bot_token:
-        description: 'SLACK_BOT_TOKEN '
+        description: 'SLACK_BOT_TOKEN'
+        required: false
+      slack_channel_id:
+        description: 'SLACK_CHANNEL_ID'
         required: false
 
 
@@ -111,11 +111,11 @@ jobs:
 
       - name: Post to a Slack channel
         id: slack
-        if: ${{ failure() && inputs.slack_channel_id != 0 }}
+        if: failure()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.slack_bot_token }}
         uses: slackapi/slack-github-action@v1.16.0
         with:
-          channel-id: ${{ inputs.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
+          channel-id: ${{ secrets.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
           slack-message: Build failed ${{ steps.vars.outputs.run_url }}
 

@@ -14,6 +14,12 @@ on:
       docker_build_command:
         required: false
         type: string
+      ecs_service:
+        required: false
+        type: string
+      ecs_cluster:
+        required: false
+        type: string
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
@@ -108,6 +114,29 @@ jobs:
         if: ${{ success() && inputs.docker_build_command != 0 }}
         run: |
           docker push ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
+
+      - name: Download AWS ECS deplyment task definition
+        if: ${{ success() && inputs.ecs_service != 0 && inputs.ecs_cluster != 0 }}
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ inputs.ecs_service }} --query taskDefinition > task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        if: ${{ success() && inputs.ecs_service != 0 && inputs.ecs_cluster != 0 }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: app
+          image: ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
+
+      - name: Deploy Amazon ECS task definition
+        if: ${{ success() && inputs.ecs_service != 0 && inputs.ecs_cluster != 0 }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: ${{ inputs.ecs_service }}
+          cluster: ${{ inputs.ecs_cluster }}
+          wait-for-service-stability: true
 
       - name: Post to a Slack channel
         id: slack

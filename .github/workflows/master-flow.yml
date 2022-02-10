@@ -33,6 +33,12 @@ on:
       slack_channel_id:
         description: 'SLACK_CHANNEL_ID'
         required: false
+      ecs_service:
+        description: 'ECS service'
+        required: false
+      ecs_cluster:
+        description: 'ECS cluster'
+        required: false
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -108,6 +114,29 @@ jobs:
         if: ${{ success() && inputs.docker_build_command != 0 }}
         run: |
           docker push ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
+
+      - name: Download AWS ECS deplyment task definition
+        if: ${{ success() && secrets.ecs_service != 0 && secrets.ecs_cluster != 0 }}
+        run: |
+          aws ecs describe-task-definition --task-definition service --query taskDefinition > task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        if: ${{ success() && secrets.ecs_service != 0 && secrets.ecs_cluster != 0 }}
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: application
+          image: ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
+
+      - name: Deploy Amazon ECS task definition
+        if: ${{ success() && secrets.ecs_service != 0 && secrets.ecs_cluster != 0 }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: ${{ secrets.ecs_service }}
+          cluster: ${{ secrets.ecs_cluster }}
+          wait-for-service-stability: true
 
       - name: Post to a Slack channel
         id: slack

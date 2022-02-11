@@ -20,6 +20,9 @@ on:
       ecs_cluster:
         required: false
         type: string
+      slack_channel_id:
+        required: false
+        type: string
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
@@ -140,11 +143,11 @@ jobs:
 
       - name: Post to a Slack channel
         id: slack
-        if: failure()
+        if: ${{ failure() && inputs.slack_channel_id != 0 }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.slack_bot_token }}
         uses: slackapi/slack-github-action@v1.16.0
         with:
-          channel-id: ${{ secrets.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
-          slack-message: Build failed ${{ steps.vars.outputs.run_url }}
+          channel-id: ${{ inputs.slack_channel_id }}  # Slack channel id or user id to post message. https://api.slack.com/methods/chat.postMessage#channels
+          slack-message: Deployment failed ${{ steps.vars.outputs.run_url }}
 

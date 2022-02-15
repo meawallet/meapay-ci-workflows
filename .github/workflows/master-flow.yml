@@ -126,28 +126,11 @@ jobs:
         run: |
           docker push ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
 
-      - name: Download AWS ECS deplyment task definition
-        if: ${{ success() && inputs.ecs_service != 0 && inputs.ecs_cluster != 0 }}
+      - name: Dispatch deploy-dev event
         run: |
-          aws ecs describe-task-definition --task-definition ${{ inputs.ecs_service }} --query taskDefinition > task-definition.json
-
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        if: ${{ success() && inputs.ecs_service != 0 && inputs.ecs_cluster != 0 }}
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: app
-          image: ${{ inputs.image_name }}:${{ steps.vars.outputs.image_version }}
-
-      - name: Deploy Amazon ECS task definition
-        if: ${{ success() && inputs.ecs_service != 0 && inputs.ecs_cluster != 0 }}
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          service: ${{ inputs.ecs_service }}
-          cluster: ${{ inputs.ecs_cluster }}
-          wait-for-service-stability: true
+          curl -d "{\"event_type\": \"deploy-dev\", "params": { "image_name": "${{ inputs.image_name }}", "image_version": "${{ steps.vars.outputs.image_version }}"}}" \
+          -H "Content-Type: application/json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.everest-preview+json" "https://api.github.com/repos/${{ github.repository }}/dispatches"
 
       - name: Post to a Slack channel
         id: slack

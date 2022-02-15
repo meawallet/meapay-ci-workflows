@@ -23,6 +23,11 @@ on:
       slack_channel_id:
         required: false
         type: string
+    # Map the workflow outputs to job outputs
+    outputs:
+      image_version:
+        description: "Image version"
+        value: ${{ jobs.build.outputs.output1 }}
     secrets:
       maven_repo_access_token:
         description: 'Maven repo access token'
@@ -51,6 +56,9 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # Map the job outputs to step outputs
+    outputs:
+      output1: ${{ steps.vars.outputs.image_version }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

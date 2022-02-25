@@ -47,6 +47,9 @@ on:
       slack_channel_id:
         description: 'SLACK_CHANNEL_ID'
         required: false
+      deploy_repo_token:
+        description: 'Deploy repo token'
+        required: false
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -130,8 +133,8 @@ jobs:
         if: ${{ success() && inputs.service_name != 0 && inputs.deploy_repo != 0 }}
         run: |
           curl -d "{\"event_type\": \"deploy-dev\", \"client_payload\": { \"service_name\": \"${{ inputs.service_name }}\", \"image_version\": \"${{ steps.vars.outputs.image_version }}\"}}" \
-          -H "Content-Type: application/json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.everest-preview+json" "https://api.github.com/repos/${{ inputs.deploy_repo }}/dispatches"
+          -H "Content-Type: application/json" -H "Authorization: token ${{ secrets.deploy_repo_token }}" \
+          -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/${{ inputs.deploy_repo }}/dispatches"
 
       - name: Post to a Slack channel
         id: slack

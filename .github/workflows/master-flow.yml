@@ -50,6 +50,9 @@ on:
       deploy_repo_token:
         description: 'Deploy repo token'
         required: false
+      meawallet_maven_password:
+        description: 'Meawallet Maven Password'
+        required: false        
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -107,7 +110,7 @@ jobs:
       - name: Building project
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ${{ inputs.build_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
+          arguments: ${{ inputs.build_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }} -PmeawalletMavenPassword=${{ secrets.meawallet_maven_password }}
 
       - name: Publish Artifacts
         uses: gradle/gradle-build-action@v2

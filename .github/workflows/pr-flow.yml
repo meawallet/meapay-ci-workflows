@@ -83,7 +83,7 @@ jobs:
       - name: Build project
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ${{ inputs.build_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }}
+          arguments: ${{ inputs.build_command }} -PmavenUser=aws -PmavenPassword=${{ steps.vars.outputs.codeartifact_auth_token }} -PmeawalletMavenPassword=${{ secrets.meawallet_maven_password }}
       - name: Publish spotbugs results
         uses: jwgmeligmeyling/spotbugs-github-action@master
         if: ${{ failure() && inputs.spotbugs_results_files != 0 }}

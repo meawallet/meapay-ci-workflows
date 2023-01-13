@@ -81,7 +81,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         if: ${{ success() && inputs.artifacts_publish_command != 0 }}
         with:
-          arguments: ${{ inputs.artifacts_publish_command }}
+          arguments: ${{ inputs.artifacts_publish_command }} -PmavenUser=${{ secrets.maven_user }} -PmavenPassword=${{ secrets.maven_password }}
 
       - name: Post to a Slack channel
         id: slack
